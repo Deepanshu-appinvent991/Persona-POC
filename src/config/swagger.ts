@@ -12,12 +12,46 @@ const options = {
       contact: {
         name: 'API Support',
         email: 'support@persona-poc.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
       }
     },
     servers: [
       {
         url: process.env.BASE_URL || 'http://localhost:3000',
         description: 'Development server'
+      },
+      {
+        url: 'https://api.persona-poc.com',
+        description: 'Production server'
+      },
+      {
+        url: 'https://staging-api.persona-poc.com',
+        description: 'Staging server'
+      }
+    ],
+    tags: [
+      {
+        name: 'Authentication',
+        description: 'User authentication and profile management'
+      },
+      {
+        name: 'Entities',
+        description: 'Entity CRUD operations and management'
+      },
+      {
+        name: 'Step Entity Creation',
+        description: 'Step-by-step entity creation process'
+      },
+      {
+        name: 'File Management',
+        description: 'File upload, download, and management'
+      },
+      {
+        name: 'Approval Workflow',
+        description: 'Entity approval workflow and status management'
       }
     ],
     components: {
@@ -240,6 +274,114 @@ const options = {
               description: 'Response data'
             }
           }
+        },
+        StepProgress: {
+          type: 'object',
+          properties: {
+            tempEntityId: {
+              type: 'string',
+              example: 'temp_entity_1635123456789_abc123def'
+            },
+            currentStep: {
+              type: 'number',
+              example: 3
+            },
+            totalSteps: {
+              type: 'number',
+              example: 6
+            },
+            completedSteps: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              example: ['basic_info', 'contact_info', 'address_info']
+            },
+            progress: {
+              type: 'number',
+              example: 50,
+              description: 'Progress percentage'
+            },
+            nextStep: {
+              type: 'number',
+              nullable: true,
+              example: 4
+            },
+            entityData: {
+              type: 'object',
+              description: 'Current entity data'
+            }
+          }
+        },
+        FileInfo: {
+          type: 'object',
+          properties: {
+            filename: {
+              type: 'string',
+              example: 'document-1635123456789.pdf'
+            },
+            originalName: {
+              type: 'string',
+              example: 'contract.pdf'
+            },
+            type: {
+              type: 'string',
+              enum: ['PDF', 'IMAGE', 'CSV', 'OTHER'],
+              example: 'PDF'
+            },
+            size: {
+              type: 'number',
+              example: 1024000
+            },
+            uploadedAt: {
+              type: 'string',
+              format: 'date-time',
+              example: '2023-10-25T10:30:00.000Z'
+            },
+            url: {
+              type: 'string',
+              example: '/uploads/documents/document-1635123456789.pdf'
+            }
+          }
+        },
+        PaginationInfo: {
+          type: 'object',
+          properties: {
+            totalDocs: {
+              type: 'number',
+              example: 100
+            },
+            limit: {
+              type: 'number',
+              example: 10
+            },
+            totalPages: {
+              type: 'number',
+              example: 10
+            },
+            page: {
+              type: 'number',
+              example: 1
+            },
+            hasPrevPage: {
+              type: 'boolean',
+              example: false
+            },
+            hasNextPage: {
+              type: 'boolean',
+              example: true
+            },
+            prevPage: {
+              type: 'number',
+              nullable: true,
+              example: null
+            },
+            nextPage: {
+              type: 'number',
+              nullable: true,
+              example: 2
+            }
+          }
         }
       }
     },
@@ -257,8 +399,23 @@ const specs = swaggerJsdoc(options);
 export const setupSwagger = (app: Express) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Persona POC API Documentation'
+    customCss: `
+      .swagger-ui .topbar { display: none }
+      .swagger-ui .info .title { color: #2c3e50; }
+      .swagger-ui .info .description p { font-size: 14px; line-height: 1.6; }
+      .swagger-ui .scheme-container { background: #f8f9fa; padding: 10px; border-radius: 5px; }
+    `,
+    customSiteTitle: 'Persona POC API Documentation',
+    customfavIcon: '/favicon.ico',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      docExpansion: 'tag',
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      operationsSorter: 'alpha'
+    }
   }));
   
   // Serve swagger.json
@@ -267,5 +424,18 @@ export const setupSwagger = (app: Express) => {
     res.send(specs);
   });
   
+  // Health check endpoint for API documentation
+  app.get('/api/health', (req, res) => {
+    res.json({
+      success: true,
+      message: 'Persona POC API is running',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+      documentation: '/api-docs'
+    });
+  });
+  
   console.log('📚 Swagger documentation available at /api-docs');
+  console.log('🔍 API health check available at /api/health');
+  console.log('📄 Swagger JSON available at /api-docs.json');
 };
