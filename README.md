@@ -82,28 +82,6 @@ npm run dev
 
 ### 🔐 Authentication (No Tokens Required)
 
-| Method | URL | Description |
-|--------|-----|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-| GET | `/api/auth/me/:userId` | Get user info |
-| PUT | `/api/auth/profile/:userId` | Update profile |
-| PUT | `/api/auth/change-password/:userId` | Change password |
-| POST | `/api/auth/logout/:userId` | Logout user |
-
-### 👤 Entity Management
-
-| Method | URL | Description |
-|--------|-----|-------------|
-| GET | `/api/entities` | Get all entities |
-| POST | `/api/entities` | Create new entity |
-| GET | `/api/entities/:id` | Get entity by ID |
-| PUT | `/api/entities/:id` | Update entity |
-| DELETE | `/api/entities/:id` | Delete entity |
-| PUT | `/api/entities/:id/approve` | Approve entity |
-| PUT | `/api/entities/:id/reject` | Reject entity |
-| GET | `/api/entities/stats` | Get statistics |
-
 ### 📁 File Management
 
 | Method | URL | Description |
@@ -128,49 +106,7 @@ npm run dev
 
 ## 🧪 Testing the API
 
-### 1. Register a User
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "email": "john@example.com",
-    "password": "Password123",
-    "firstName": "John",
-    "lastName": "Doe"
-  }'
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "user": {
-      "_id": "60f7b3b3b3b3b3b3b3b3b3b3",
-      "username": "johndoe",
-      "email": "john@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "USER",
-      "isActive": true
-    }
-  }
-}
-```
-
-### 2. Login User
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "Password123"
-  }'
-```
-
-### 3. Create Entity
+### 1. Create Entity
 ```bash
 curl -X POST http://localhost:3000/api/entities \
   -H "Content-Type: application/json" \
@@ -189,12 +125,12 @@ curl -X POST http://localhost:3000/api/entities \
   }'
 ```
 
-### 4. Get All Entities
+### 2. Get All Entities
 ```bash
 curl http://localhost:3000/api/entities
 ```
 
-### 5. Approve Entity
+### 3. Approve Entity
 ```bash
 curl -X PUT http://localhost:3000/api/entities/ENTITY_ID/approve \
   -H "Content-Type: application/json" \
